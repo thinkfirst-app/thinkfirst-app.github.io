@@ -1,13 +1,25 @@
 const $ = id => document.getElementById(id);
 
 // ---------- Tabs ----------
-document.querySelectorAll("[data-tab]").forEach(tab => tab.addEventListener("click", () => {
-  document.querySelectorAll("[data-tab]").forEach(t => {
+const tabs = [...document.querySelectorAll("[data-tab]")];
+function selectTab(tab, focus = false) {
+  tabs.forEach(t => {
     const on = t === tab;
     t.setAttribute("aria-selected", on);
+    t.tabIndex = on ? 0 : -1;
     $(t.dataset.tab).hidden = !on;
   });
-}));
+  if (focus) tab.focus();
+}
+tabs.forEach((tab, i) => {
+  tab.addEventListener("click", () => selectTab(tab));
+  tab.addEventListener("keydown", e => {
+    const step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : e.key === "Home" ? -i : e.key === "End" ? tabs.length - 1 - i : 0;
+    if (!step) return;
+    e.preventDefault();
+    selectTab(tabs[(i + step + tabs.length) % tabs.length], true);
+  });
+});
 
 // ---------- Habits ----------
 function renderHabits(usage) {

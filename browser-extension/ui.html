@@ -1,63 +1,105 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
+<title>Think First</title>
 <style>
-  :root { color-scheme: normal; --paper:#FFFFFF; --ink:#1F2A37; --muted:#5B6573; --line:#CBD2DA; --field:#F6F8FA; --mark:#F2C94C; --markSoft:rgba(242,201,76,.35); --bad:#B42318; }
-  @media (prefers-color-scheme: dark) {
-    :root { --paper:#1B2430; --ink:#E8EDF2; --muted:#9AA6B2; --line:#3A4654; --field:#141B24; --mark:#E0B83C; --markSoft:rgba(224,184,60,.25); --bad:#F97066; }
+  @font-face { font-family: "Geist"; src: url(fonts/Geist.woff2) format("woff2"); font-weight: 400 700; font-display: swap; }
+  @font-face { font-family: "Geist Mono"; src: url(fonts/GeistMono.woff2) format("woff2"); font-weight: 400 500; font-display: swap; }
+  :root {
+    color-scheme: light;
+    --bg:#fafaf9; --surface:#fff; --ink:#111214; --muted:#5f636b; --faint:#6b6e76;
+    --border:#e3e3e0; --border-soft:#ececea;
+    --accent:#2E6FE4; --accent-text:#2a64d2; --tint:#eaf0fd; --tint-2:#f3f6fd; --tint-border:#dfe8fb; --tint-active:#c9d8f7;
+    --warn:#E4572E; --warn-text:#c9492a; --warn-bg:#fdf4f1; --warn-ink:#7a3a26; --track:#f0f0ee;
+    --font:"Geist",system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: transparent; overflow-x: hidden; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); }
+  html, body { margin: 0; background: transparent; overflow-x: hidden; font-family: var(--font); color: var(--ink); -webkit-font-smoothing: antialiased; font-feature-settings: "ss01"; }
   [hidden] { display: none !important; }
+  ::selection { background: #d5e2fb; }
+  button, textarea { font: inherit; color: inherit; margin: 0; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
-  .veil { position: fixed; inset: 0; background: rgba(20,28,40,.4); display: flex; align-items: center; justify-content: center; padding: 16px; }
-  .card { width: min(520px, 100%); background: var(--paper); border-radius: 14px; padding: 20px; box-shadow: 0 18px 50px rgba(0,0,0,.3); }
-  @media (prefers-reduced-motion: no-preference) { .card { animation: pop .14s ease-out; } @keyframes pop { from { transform: scale(.97); opacity: 0; } } }
-  h2 { margin: 0 0 4px; font-size: 18px; font-weight: 650; }
-  .sub { margin: 0 0 12px; font-size: 13px; color: var(--muted); }
-  .q { font-size: 13px; color: var(--muted); border-left: 3px solid var(--mark); padding: 2px 0 2px 10px; margin: 0 0 10px; max-height: 58px; overflow: hidden; }
-  .usage { font-size: 13px; margin: 0 0 12px; }
-  .usage b { background: var(--markSoft); padding: 1px 5px; border-radius: 4px; font-weight: 600; }
-  textarea { width: 100%; min-height: 84px; resize: vertical; border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; font: inherit; font-size: 15px; background: var(--field); color: var(--ink); }
-  textarea:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px var(--markSoft); }
-  .row { display: flex; gap: 8px; justify-content: space-between; align-items: center; margin-top: 12px; flex-wrap: wrap; }
-  .hint { font-size: 12px; color: var(--muted); }
-  button { font: inherit; font-size: 14px; border-radius: 9px; padding: 8px 14px; cursor: pointer; border: 1.5px solid var(--line); background: transparent; color: var(--ink); }
-  button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-  button:focus-visible { outline: 3px solid var(--mark); outline-offset: 2px; }
-  button:disabled { opacity: .5; cursor: default; }
+  /* The guess dialog */
+  .veil { position: fixed; inset: 0; background: rgba(17,18,20,.45); display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .card { width: min(560px, 100%); background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px 22px 18px; box-shadow: 0 1px 2px rgba(17,18,20,.06), 0 30px 80px -30px rgba(17,18,20,.45); }
+  @media (prefers-reduced-motion: no-preference) { .card { animation: pop .18s ease-out; } @keyframes pop { from { transform: translateY(6px); opacity: 0; } } }
+  .brand { display: flex; align-items: center; gap: 8px; margin: 0 0 16px; font-size: 14px; font-weight: 600; letter-spacing: -.03em; line-height: 1; }
+  .brand svg { display: block; flex: none; }
+  .steps { margin-left: auto; display: flex; gap: 6px; font-size: 12px; font-weight: 400; letter-spacing: 0; color: var(--faint); list-style: none; padding: 0; }
+  .steps li + li::before { content: "—"; margin-right: 6px; }
+  .steps li.is-done { color: var(--muted); }
+  .steps li[aria-current] { color: var(--ink); font-weight: 600; }
+  h2 { margin: 0 0 4px; font-size: 20px; font-weight: 600; letter-spacing: -.02em; line-height: 1.25; }
+  .sub { margin: 0 0 14px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+  .q { margin: 0 0 8px; font-size: 16px; font-weight: 500; letter-spacing: -.01em; line-height: 1.4; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .usage { margin: 0 0 14px; font-size: 13px; color: var(--muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; min-height: 0; }
+  .usage:empty { display: none; }
+  .usage b { font-family: var(--mono); font-weight: 400; font-size: 12px; color: var(--muted); border: 1px solid var(--border); border-radius: 6px; padding: 2px 7px; }
+  .gbox { border: 1px solid var(--border-soft); border-radius: 12px; background: var(--bg); overflow: hidden; transition: border-color .15s; }
+  .gbox.is-valid { border-color: var(--tint-active); }
+  textarea { display: block; width: 100%; min-height: 98px; border: 0; padding: 14px 16px; font-size: 15px; line-height: 1.55; background: transparent; color: var(--ink); resize: none; }
+  textarea::placeholder { color: var(--faint); opacity: 1; }
+  textarea:focus-visible { outline-offset: -2px; border-radius: 12px 12px 0 0; }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 8px 8px 16px; border-top: 1px solid var(--border-soft); background: var(--surface); flex-wrap: wrap; }
+  .row span:last-child { display: inline-flex; gap: 6px; }
+  .hint { font-size: 13px; color: var(--faint); line-height: 1.4; }
+  .hint.is-ok { color: var(--accent-text); }
+  button { font-size: 14px; font-weight: 500; line-height: 1.3; border-radius: 8px; padding: 8px 14px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); min-height: 36px; }
+  button:hover { color: var(--accent-text); border-color: var(--tint-active); }
+  button.primary { background: var(--ink); color: #fff; border-color: var(--ink); padding: 8px 16px; }
+  button.primary:hover { color: #fff; background: #2a2c31; border-color: #2a2c31; }
+  button:disabled { background: var(--track); color: var(--faint); border-color: var(--track); cursor: not-allowed; }
 
-  .panel { margin: 20px; background: var(--paper); border-radius: 14px; padding: 16px 18px; box-shadow: 0 6px 16px rgba(0,0,0,.2); border: 1px solid var(--line); border-top: 6px solid var(--mark); }
-  .panel h3 { margin: 0 0 8px; font-size: 16px; font-weight: 650; display: flex; justify-content: space-between; align-items: center; }
-  .x { border: none; padding: 2px 6px; font-size: 18px; line-height: 1; color: var(--muted); }
-  .note { font-size: 13px; background: var(--markSoft); border-radius: 8px; padding: 8px 10px; margin: 0 0 10px; }
-  .guess { font-size: 15px; white-space: pre-wrap; margin: 0 0 10px; }
-  .status { font-size: 13px; color: var(--muted); margin: 0 0 8px; }
-  .result { font-size: 14px; line-height: 1.5; }
-  .result ul { margin: 4px 0 8px; padding-left: 18px; }
-  .result strong { display: block; }
-  .verdict { display: block; width: fit-content; font-size: 13px; font-weight: 600; padding: 2px 9px; border-radius: 99px; margin-bottom: 8px; background: var(--markSoft); }
-  .err { color: var(--bad); }
-  .small { font-size: 12px; padding: 5px 10px; }
+  /* The comparison panel */
+  .panel { margin: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px 18px 18px; box-shadow: 0 1px 2px rgba(17,18,20,.06), 0 24px 60px -30px rgba(17,18,20,.4); }
+  .panel h3 { margin: 0 0 10px; font-size: 13px; font-weight: 500; color: var(--accent-text); display: flex; justify-content: space-between; align-items: center; gap: 8px; line-height: 1.4; }
+  .x { border: 0; background: none; padding: 0; width: 28px; height: 28px; min-height: 0; font-size: 18px; line-height: 1; color: var(--faint); border-radius: 6px; display: inline-grid; place-items: center; }
+  .x:hover { color: var(--ink); background: var(--track); border: 0; }
+  .note { position: relative; margin: 0 0 12px; padding: 10px 12px 10px 28px; font-size: 13px; line-height: 1.5; background: var(--warn-bg); color: var(--warn-ink); border-radius: 10px; }
+  .note::before { content: ""; position: absolute; left: 12px; top: 16px; width: 6px; height: 6px; border-radius: 50%; background: var(--warn); }
+  .guess { margin: 0 0 10px; font-size: 15px; line-height: 1.55; white-space: pre-wrap; color: var(--ink); }
+  .status { margin: 0 0 10px; font-size: 13px; line-height: 1.5; color: var(--faint); }
+  .status:empty { display: none; }
+  .status.err { color: var(--warn-text); }
+  .result { font-size: 14px; line-height: 1.55; color: var(--muted); background: var(--tint-2); border: 1px solid var(--tint-border); border-radius: 12px; padding: 14px 16px; }
+  .result:empty { display: none; }
+  .result ul { margin: 4px 0 6px; padding-left: 18px; }
+  .result strong { display: block; margin-top: 10px; font-size: 13px; font-weight: 600; color: var(--ink); }
+  .result p { margin: 10px 0 0; color: var(--ink); }
+  .verdict { display: inline-block; font-size: 13px; font-weight: 500; padding: 3px 10px; border-radius: 999px; background: var(--tint); color: var(--accent-text); }
+  .verdict-partial { background: var(--track); color: var(--ink); }
+  .verdict-different { background: var(--warn-bg); color: var(--warn-text); }
+  .small { font-size: 13px; padding: 6px 10px; min-height: 30px; margin-top: 4px; }
+  @media (prefers-reduced-motion: reduce) { .gbox { transition: none; } }
+  @media (forced-colors: active) { button, .gbox, .result, .note { border: 1px solid ButtonText; } }
 </style>
 </head>
 <body>
-  <div class="veil" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="title">
+  <div class="veil" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="title" aria-describedby="sub">
     <div class="card">
-      <h2 id="title">What's your guess?</h2>
-      <p class="sub">One line is plenty. It gets compared with the answer automatically.</p>
+      <p class="brand"><svg width="24" height="16" viewBox="0 0 30 20" aria-hidden="true" focusable="false"><circle cx="19" cy="10" r="8" fill="none" stroke="#111214" stroke-width="2"/><circle cx="10" cy="10" r="9" fill="#2E6FE4"/></svg>think first
+        <ol class="steps" aria-label="Progress"><li class="is-done">Ask</li><li aria-current="step">Guess</li><li>Compare</li></ol></p>
+      <h2 id="title">Your answer first.</h2>
+      <p class="sub" id="sub">A rough answer is fine, and so is a wrong one. It just can't be blank.</p>
       <p class="q" id="question"></p>
       <p class="usage" id="usage"></p>
-      <textarea id="guessBox" placeholder="I think it's probably… because…"></textarea>
-      <div class="row">
-        <span class="hint">Enter to send, Esc to skip</span>
-        <span><button id="skip">Skip</button> <button class="primary" id="go">Send with guess</button></span>
+      <div class="gbox" id="gbox">
+        <label for="guessBox" class="sr-only">Your guess</label>
+        <textarea id="guessBox" rows="3" placeholder="I think it's probably… because…" aria-describedby="hint"></textarea>
+        <div class="row">
+          <span class="hint" id="hint">Enter to send, Esc to skip</span>
+          <span><button id="skip">Skip</button><button class="primary" id="go">Send with guess</button></span>
+        </div>
       </div>
     </div>
   </div>
 
-  <aside class="panel" id="panel" hidden aria-live="polite">
+  <aside class="panel" id="panel" hidden aria-live="polite" aria-label="Think First">
     <h3><span id="panelTitle">Your guess</span><button class="x" id="close" aria-label="Close">×</button></h3>
     <p class="note" id="note" hidden></p>
     <div id="guessArea" hidden>

@@ -1,79 +1,119 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
+<title>Think First</title>
 <style>
-  :root { --paper:#FFFFFF; --ink:#1F2A37; --muted:#5B6573; --line:#CBD2DA; --field:#F6F8FA; --mark:#F2C94C; --markSoft:rgba(242,201,76,.35); --bad:#B42318; }
-  @media (prefers-color-scheme: dark) { :root { --paper:#1B2430; --ink:#E8EDF2; --muted:#9AA6B2; --line:#3A4654; --field:#141B24; --mark:#E0B83C; --markSoft:rgba(224,184,60,.25); --bad:#F97066; } }
+  @font-face { font-family: "Geist"; src: url(fonts/Geist.woff2) format("woff2"); font-weight: 400 700; font-display: swap; }
+  @font-face { font-family: "Geist Mono"; src: url(fonts/GeistMono.woff2) format("woff2"); font-weight: 400 500; font-display: swap; }
+  :root {
+    color-scheme: light;
+    --bg:#fafaf9; --surface:#fff; --ink:#111214; --muted:#5f636b; --faint:#6b6e76;
+    --border:#e3e3e0; --border-soft:#ececea;
+    --accent:#2E6FE4; --accent-text:#2a64d2; --tint:#eaf0fd; --tint-2:#f3f6fd; --tint-border:#dfe8fb; --tint-active:#c9d8f7;
+    --warn:#E4572E; --warn-text:#c9492a; --warn-bg:#fdf4f1; --warn-ink:#7a3a26; --track:#f0f0ee;
+    --font:"Geist",system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
   * { box-sizing: border-box; }
-  body { width: 360px; margin: 0; padding: 16px; background: var(--paper); color: var(--ink); font: 14px/1.45 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; border-top: 5px solid var(--mark); }
-  h1 { font-size: 17px; margin: 0 0 2px; }
-  .sub { color: var(--muted); font-size: 12px; margin: 0 0 12px; }
-  .tabs { display: flex; gap: 4px; border-bottom: 1.5px solid var(--line); margin-bottom: 12px; }
-  .tabs button { border: none; border-radius: 0; background: none; padding: 6px 10px; margin-bottom: -1.5px; color: var(--muted); border-bottom: 2.5px solid transparent; }
-  .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--mark); font-weight: 600; }
-  .total { font-size: 13px; margin: 0 0 10px; }
-  .total b { font-size: 22px; margin-right: 4px; }
-  .bar { margin: 0 0 8px; }
-  .bar .top { display: flex; justify-content: space-between; font-size: 13px; }
-  .bar .track { height: 7px; background: var(--field); border-radius: 4px; overflow: hidden; margin-top: 3px; }
-  .bar .fill { height: 100%; background: var(--line); border-radius: 4px; }
-  .bar.frequent .fill { background: var(--mark); }
-  .flag { font-size: 11px; font-weight: 600; background: var(--markSoft); padding: 0 6px; border-radius: 4px; margin-left: 6px; }
-  .delta { color: var(--muted); font-size: 12px; }
-  .empty { color: var(--muted); font-size: 13px; }
-  .stats { display: flex; gap: 14px; margin-bottom: 12px; }
-  .stats div { font-size: 12px; color: var(--muted); }
-  .stats b { display: block; font-size: 20px; color: var(--ink); }
+  body { width: 360px; margin: 0; padding: 0 0 4px; background: var(--surface); color: var(--ink); font: 14px/1.45 var(--font); -webkit-font-smoothing: antialiased; font-feature-settings: "ss01"; }
+  [hidden] { display: none !important; }
+  ::selection { background: #d5e2fb; }
+  button, input, select { font: inherit; color: inherit; margin: 0; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  p { margin: 0; }
+
+  .hdr { display: flex; align-items: center; gap: 8px; padding: 14px 16px 0; }
+  .hdr svg { display: block; flex: none; }
+  h1 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -.03em; line-height: 1; }
+  .sub { padding: 4px 16px 0; font-size: 12px; color: var(--faint); }
+
+  .tabs { display: flex; gap: 6px; padding: 12px 16px 0; }
+  .tabs button { border: 1px solid var(--border-soft); background: var(--bg); color: var(--muted); border-radius: 8px; padding: 5px 10px; font-size: 13px; line-height: 1.3; min-height: 28px; }
+  .tabs button:hover { color: var(--accent-text); border-color: var(--tint-active); }
+  .tabs button[aria-selected="true"] { background: var(--ink); color: #fff; border-color: var(--ink); font-weight: 500; }
+
+  .ai { margin: 12px 16px 0; background: var(--tint-2); border: 1px solid var(--tint-border); border-radius: 12px; padding: 10px 12px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+  .ai p { margin: 0; }
+  .ai p + button { margin-top: 8px; }
+  section { padding: 14px 16px 12px; }
+  section .ai { margin: 0 0 12px; }
+
+  .total { font-size: 13px; color: var(--muted); margin: 0 0 8px; line-height: 1.4; }
+  .total b { font-size: 24px; font-weight: 600; letter-spacing: -.03em; color: var(--ink); margin-right: 6px; line-height: 1; }
+  #bars { margin-top: 12px; }
+  .bar { margin: 0 0 10px; }
+  .bar .top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 13px; }
+  .bar .top > span:last-child { font-family: var(--mono); font-size: 12px; color: var(--faint); }
+  .bar .track { height: 6px; background: var(--track); border-radius: 3px; overflow: hidden; margin-top: 5px; }
+  .bar .fill { height: 100%; background: var(--tint-active); border-radius: 3px; }
+  .bar.frequent .fill { background: var(--accent); }
+  .flag { font-family: var(--font); font-size: 11px; font-weight: 500; background: var(--tint); color: var(--accent-text); padding: 1px 7px; border-radius: 999px; margin-left: 6px; vertical-align: 1px; }
+  .delta { color: var(--faint); font-size: 12px; }
+  .empty { color: var(--faint); font-size: 13px; line-height: 1.5; }
+
+  .stats { display: flex; gap: 16px; margin-bottom: 8px; }
+  .stats div { font-size: 12px; color: var(--faint); }
+  .stats b { display: block; font-size: 20px; font-weight: 600; letter-spacing: -.03em; color: var(--ink); line-height: 1.2; }
   ol { list-style: none; margin: 0; padding: 0; max-height: 220px; overflow: auto; }
-  li { padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
+  li { padding: 8px 0; border-top: 1px solid var(--border-soft); font-size: 12px; line-height: 1.45; }
   li .g { color: var(--ink); }
-  li .m { color: var(--muted); }
-  label { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
-  .check { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--ink); margin: 8px 0; }
-  input[type=text], input[type=password], input[type=number], select { width: 100%; padding: 7px 9px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--field); color: var(--ink); font: inherit; font-size: 13px; }
-  button { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 8px; border: 1.5px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; }
-  button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-  .ai { background: var(--field); border-radius: 10px; padding: 10px 12px; font-size: 13px; margin-bottom: 6px; }
-  .ai p { margin: 0 0 8px; }
-  .row { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
-  .saved { font-size: 12px; color: var(--muted); }
+  li .m { color: var(--faint); margin-top: 2px; }
+
+  label { display: block; font-size: 12px; color: var(--faint); margin: 10px 0 4px; }
+  .check { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--ink); margin: 10px 0; line-height: 1.4; }
+  input[type=checkbox] { accent-color: var(--accent); margin: 2px 0 0; flex: none; width: 15px; height: 15px; }
+  input[type=text], input[type=password], input[type=number], select { width: 100%; padding: 7px 9px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--ink); font-size: 13px; }
+  input:focus-visible, select:focus-visible { outline-offset: 0; border-color: var(--accent); }
+  button { font-size: 13px; font-weight: 500; line-height: 1.3; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); min-height: 32px; }
+  button:hover { color: var(--accent-text); border-color: var(--tint-active); }
+  button.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+  button.primary:hover { color: #fff; background: #2a2c31; border-color: #2a2c31; }
+  button:disabled { background: var(--track); color: var(--faint); border-color: var(--track); cursor: not-allowed; }
+  .row { display: flex; gap: 8px; margin-top: 12px; align-items: center; flex-wrap: wrap; }
+  .saved { font-size: 12px; color: var(--accent-text); }
   details { margin-top: 10px; font-size: 13px; }
-  summary { cursor: pointer; color: var(--muted); }
+  summary { cursor: pointer; color: var(--accent-text); font-weight: 500; padding: 4px 0; border-radius: 4px; }
+  @media (forced-colors: active) { button, input, select, .ai { border: 1px solid ButtonText; } .tabs button[aria-selected="true"] { outline: 2px solid Highlight; } }
 </style>
 </head>
 <body>
-  <h1>Think First</h1>
+  <header class="hdr">
+    <svg width="24" height="16" viewBox="0 0 30 20" aria-hidden="true" focusable="false"><circle cx="19" cy="10" r="8" fill="none" stroke="#111214" stroke-width="2"/><circle cx="10" cy="10" r="9" fill="#2E6FE4"/></svg>
+    <h1>think first</h1>
+  </header>
+  <main>
   <p class="sub">Think before you read the answer.</p>
 
-  <div class="tabs" role="tablist">
-    <button role="tab" aria-selected="true" data-tab="habits">Your AI habits</button>
-    <button role="tab" aria-selected="false" data-tab="guesses">Guesses</button>
-    <button role="tab" aria-selected="false" data-tab="settings">Settings</button>
+  <div class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" id="tab-habits" aria-selected="true" aria-controls="habits" data-tab="habits">Your AI habits</button>
+    <button role="tab" id="tab-guesses" aria-selected="false" aria-controls="guesses" data-tab="guesses" tabindex="-1">Guesses</button>
+    <button role="tab" id="tab-settings" aria-selected="false" aria-controls="settings" data-tab="settings" tabindex="-1">Settings</button>
   </div>
 
-  <div class="ai" id="hubBox">
+  <div class="ai" id="hubBox" role="status">
     <p id="hubStatus">Checking for the desktop app…</p>
     <button id="openDash" class="primary" hidden>Open full dashboard</button>
   </div>
 
-  <section id="habits">
+  <section id="habits" role="tabpanel" aria-labelledby="tab-habits">
     <p class="total"><b id="weekTotal">0</b>requests to AI in the last 7 days <span class="delta" id="weekDelta"></span></p>
     <p class="total" id="timeLine"></p>
     <div id="bars"></div>
   </section>
 
-  <section id="guesses" hidden>
+  <section id="guesses" role="tabpanel" aria-labelledby="tab-guesses" hidden>
     <div class="stats">
       <div><b id="total">0</b>guesses</div>
       <div><b id="match">–</b>matched</div>
       <div><b id="partial">–</b>partly</div>
       <div><b id="diff">–</b>different</div>
     </div>
-    <ol id="history"></ol>
+    <ol id="history" aria-label="Recent guesses"></ol>
   </section>
 
-  <section id="settings" hidden>
+  <section id="settings" role="tabpanel" aria-labelledby="tab-settings" hidden>
     <div class="ai">
       <p id="aiStatus">Checking the built-in AI…</p>
       <button id="setupAI" class="primary" hidden>Turn on built-in AI</button>
@@ -81,9 +121,9 @@
     <details id="keyBox">
       <summary>Use an Anthropic API key instead</summary>
       <label for="apiKey">API key (stored only in this browser)</label>
-      <input type="password" id="apiKey" placeholder="sk-ant-…">
+      <input type="password" id="apiKey" placeholder="sk-ant-…" autocomplete="off">
       <label for="model">Model</label>
-      <input type="text" id="model">
+      <input type="text" id="model" autocomplete="off">
       <label class="check"><input type="checkbox" id="preferKey"> Use the API key even when built-in AI is available</label>
     </details>
 
@@ -98,9 +138,10 @@
     <label class="check"><input type="checkbox" id="trackUsage"> Count what kinds of tasks I ask AI for</label>
     <label class="check"><input type="checkbox" id="aiSort"> Use AI to sort tasks (more accurate than keywords)</label>
 
-    <div class="row"><button id="save" class="primary">Save settings</button><span class="saved" id="savedMsg"></span></div>
+    <div class="row"><button id="save" class="primary">Save settings</button><span class="saved" id="savedMsg" role="status"></span></div>
     <div class="row"><button id="export">Export my data</button><button id="clear">Delete my data</button></div>
   </section>
+  </main>
 
   <script src="ai.js"></script>
   <script src="popup.js"></script>

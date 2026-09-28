@@ -134,6 +134,9 @@ function openModal(text, category, weekCount) {
     $("usage").append(b, ` request number ${weekCount + 1} this week.`);
   }
   $("guessBox").value = "";
+  $("gbox").classList.remove("is-valid");
+  $("hint").textContent = "Enter to send, Esc to skip";
+  $("hint").classList.remove("is-ok");
   $("modal").hidden = false;
   sync();
   setTimeout(() => $("guessBox").focus(), 30);
@@ -160,6 +163,12 @@ function finish(withGuess) {
 
 $("go").addEventListener("click", () => finish(true));
 $("skip").addEventListener("click", () => finish(false));
+$("guessBox").addEventListener("input", () => {
+  const has = $("guessBox").value.trim().length > 0;
+  $("gbox").classList.toggle("is-valid", has);
+  $("hint").textContent = has ? "Guess locked in · Enter to send" : "Enter to send, Esc to skip";
+  $("hint").classList.toggle("is-ok", has);
+});
 $("guessBox").addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); finish(true); }
   if (e.key === "Escape") { e.preventDefault(); finish(false); }
@@ -196,7 +205,7 @@ function renderResult(r) {
   const box = $("result");
   box.innerHTML = "";
   const add = (tag, text, cls) => { const el = document.createElement(tag); if (cls) el.className = cls; el.textContent = text; box.appendChild(el); return el; };
-  add("span", labels[r.verdict], "verdict");
+  add("span", labels[r.verdict], "verdict verdict-" + r.verdict);
   const list = (title, items) => {
     if (!items.length) return;
     add("strong", title);
