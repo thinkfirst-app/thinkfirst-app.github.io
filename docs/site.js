@@ -14,9 +14,45 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
   // ---------- Download links ----------
+  // Buttons carry data-dl="<file name>". Names can include a version number, so after the static
+  // links are set, the page asks GitHub for the newest release and matches each file by pattern.
+  // If that request fails (offline, rate limit), the static links still point at the latest release.
   const dl = file => `https://github.com/${CONFIG.repo}/releases/latest/download/${file}`;
   $$("[data-dl]").forEach(a => { a.href = dl(a.dataset.dl); });
   $$("[data-repo]").forEach(a => { a.href = `https://github.com/${CONFIG.repo}`; });
+  $$("[data-releases]").forEach(a => { a.href = `https://github.com/${CONFIG.repo}/releases`; });
+  $$("[data-issues]").forEach(a => { a.href = `https://github.com/${CONFIG.repo}/issues`; });
+
+  const kindOf = name =>
+    /^Think-First-Chrome-.*\.zip$/i.test(name) ? "browser" :
+    /^Think-First-Mac\.zip$/i.test(name) ? "mac" :
+    /^think-first-tracker-.*\.vsix$/i.test(name) ? "code" : null;
+
+  fetch(`https://api.github.com/repos/${CONFIG.repo}/releases/latest`, { headers: { Accept: "application/vnd.github+json" } })
+    .then(r => (r.ok ? r.json() : Promise.reject(r.status)))
+    .then(rel => {
+      const byKind = {};
+      (rel.assets || []).forEach(a => {
+        const k = kindOf(a.name);
+        if (k && a.browser_download_url && !byKind[k]) byKind[k] = a.browser_download_url;
+      });
+      $$("[data-dl]").forEach(a => { const u = byKind[kindOf(a.dataset.dl)]; if (u) a.href = u; });
+
+      const v = String(rel.tag_name || "").replace(/^v/, "");
+      const line = $("#version-line");
+      if (!v || !line) return;
+      line.textContent = "";
+      line.append("Latest version ");
+      const a = document.createElement("a");
+      a.href = rel.html_url; a.textContent = v; line.append(a);
+      if (rel.published_at) {
+        const when = new Date(rel.published_at).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+        line.append(`, released ${when}`);
+      }
+      line.append(". Every release lists SHA-256 checksums.");
+      line.hidden = false;
+    })
+    .catch(() => {});
   function useStore(kind, url) {
     if (!url) return;
     $$(`[data-variant="${kind}-zip"]`).forEach(el => { el.hidden = true; });

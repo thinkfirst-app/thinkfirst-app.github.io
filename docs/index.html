@@ -23,6 +23,22 @@
 <meta name="twitter:image" content="https://thinkfirst-app.github.io/dashboard.png">
 <link rel="icon" href="logo-mark.svg" type="image/svg+xml">
 <link rel="icon" href="icon.png" type="image/png" sizes="256x256">
+<link rel="apple-touch-icon" href="icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Think First",
+  "url": "https://thinkfirst-app.github.io/",
+  "image": "https://thinkfirst-app.github.io/dashboard.png",
+  "description": "Think First keeps a record of every question you ask AI, by field and by type of request, and has you write your own guess before the answer appears. Free, open source, and everything stays on your device.",
+  "applicationCategory": "ProductivityApplication",
+  "operatingSystem": "macOS, Chrome, Visual Studio Code",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "license": "https://opensource.org/licenses/MIT",
+  "downloadUrl": "https://github.com/thinkfirst-app/thinkfirst-app.github.io/releases/latest"
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -339,6 +355,8 @@ h2{font-size:clamp(36px,4.6vw,52px);letter-spacing:-.045em;line-height:1.02}
   .bar i,.fdot,.alert i,.lbar,.tsep{background:CanvasText;forced-color-adjust:none}
   .rings,.cta-rings{display:none}
 }
+.get .version-line{margin:22px 0 0;text-align:center;color:var(--muted);font-size:14px}
+.get .version-line a{color:inherit}
 </style>
 </head>
 <body>
@@ -660,6 +678,7 @@ h2{font-size:clamp(36px,4.6vw,52px);letter-spacing:-.045em;line-height:1.02}
         <a class="btn btn-ink" href="#" data-store="code" data-variant="code-store" hidden>Get the extension</a>
       </li>
     </ul>
+    <p class="version-line" id="version-line" hidden></p>
   </section>
 </main>
 
@@ -669,6 +688,8 @@ h2{font-size:clamp(36px,4.6vw,52px);letter-spacing:-.045em;line-height:1.02}
     <ul role="list">
       <li><a href="privacy.html">Privacy</a></li>
       <li><a href="https://github.com/thinkfirst-app/thinkfirst-app.github.io" data-repo>Source code</a></li>
+      <li><a href="https://github.com/thinkfirst-app/thinkfirst-app.github.io/releases" data-releases>Releases</a></li>
+      <li><a href="https://github.com/thinkfirst-app/thinkfirst-app.github.io/issues" data-issues>Report a problem</a></li>
       <li><a href="mailto:kovacevicc.ema@gmail.com">Contact</a></li>
     </ul>
   </nav>
