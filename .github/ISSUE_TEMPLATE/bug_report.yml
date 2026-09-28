@@ -1,0 +1,60 @@
+name: Bug report
+description: Something isn't working the way it should.
+labels: [bug]
+body:
+  - type: dropdown
+    id: part
+    attributes:
+      label: Which part?
+      options:
+        - Browser extension (guess box, prompt counting)
+        - Mac app / hub (dashboard, tracker, alerts)
+        - VS Code extension
+        - Website
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Think First version
+      description: Shown in the extension popup, the dashboard footer, or the Extensions view.
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Browser, editor, or macOS version
+      placeholder: "Chrome 130 on macOS 15 · Cursor 0.44 · ChatGPT"
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Please don't include prompts or data you wouldn't want public.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open chatgpt.com
+        2. Type a message and press Enter
+        3. ...
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: For the Mac app, ~/.thinkfirst/install.log is useful. For the extension, errors from the page's developer console.
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and this isn't a duplicate.
+          required: true

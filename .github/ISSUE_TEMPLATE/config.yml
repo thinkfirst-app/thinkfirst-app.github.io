@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Website and install steps
+    url: https://thinkfirst-app.github.io/
+    about: How to install each part and what it does.
+  - name: Privacy policy
+    url: https://thinkfirst-app.github.io/privacy.html
+    about: What Think First records and where it stays.
+  - name: Report a security problem
+    url: https://github.com/thinkfirst-app/thinkfirst-app.github.io/blob/main/SECURITY.md
+    about: Please report privately by email rather than in a public issue.
