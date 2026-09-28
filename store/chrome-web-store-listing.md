@@ -47,9 +47,9 @@ Free and open source.
 
 **Icon (128×128):** already inside the package (`icon128.png`)
 
-**Official URL / Homepage:** your GitHub Pages address, for example `https://YOUR-GITHUB-USERNAME.github.io/think-first/`
+**Official URL / Homepage:** `https://thinkfirst-app.github.io/`
 
-**Support URL:** `https://github.com/YOUR-GITHUB-USERNAME/think-first/issues`
+**Support URL:** `https://github.com/thinkfirst-app/thinkfirst-app.github.io/issues`
 
 ## Privacy tab
 
@@ -71,7 +71,7 @@ Think First helps people reflect on their own use of AI chatbots: it asks for th
 
 Then certify all three statements: data is not sold to third parties; not used or transferred for purposes unrelated to the single purpose; not used or transferred to determine creditworthiness or for lending.
 
-**Privacy policy URL:** `https://YOUR-GITHUB-USERNAME.github.io/think-first/privacy.html`
+**Privacy policy URL:** `https://thinkfirst-app.github.io/privacy.html`
 
 ## Distribution tab
 

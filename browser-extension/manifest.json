@@ -3,6 +3,7 @@
   "name": "Think First",
   "version": "1.0.0",
   "description": "Guess before the AI answers, compare automatically, and track how you use AI.",
+  "homepage_url": "https://thinkfirst-app.github.io/",
   "permissions": [
     "storage"
   ],
