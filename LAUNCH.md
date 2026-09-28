@@ -22,7 +22,7 @@ This lets people install the extension with one click instead of Developer mode.
 2. Click **New item** and upload `release/Think-First-Chrome-1.0.0.zip`.
 3. Fill in every tab using `store/chrome-web-store-listing.md`, and upload the images from the `store` folder.
 4. Click **Submit for review**.
-5. When it's approved, open `docs/index.html` on GitHub, click the pencil icon, and paste your store link into `chromeStoreUrl` near the bottom. Commit. The website button switches to "Add to Chrome".
+5. When it's approved, open `docs/site.js` on GitHub, click the pencil icon, and paste your store link into `chromeStoreUrl` near the top. Commit. The website button switches to "Add to Chrome".
 
 The same zip also works in the Microsoft Edge Add-ons store, which is free to join.
 
@@ -32,7 +32,7 @@ The same zip also works in the Microsoft Edge Add-ons store, which is free to jo
 2. If `thinkfirst` is taken, pick another ID and ask Claude to rebuild the `.vsix` with it.
 3. On your publisher page, choose **New extension > Visual Studio Code** and upload `release/think-first-tracker-1.0.0.vsix`.
 4. For Cursor and other VS Code-based editors, sign in to open-vsx.org with GitHub, create the same namespace, and upload the same file.
-5. Paste the Marketplace link into `vscodeUrl` in `docs/index.html`.
+5. Paste the Marketplace link into `vscodeUrl` in `docs/site.js`.
 
 ## Part 4: Later, when people are using it
 
