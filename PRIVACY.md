@@ -36,4 +36,4 @@ Think First is not directed at children under 13.
 
 ## Changes and contact
 
-If this policy changes, the new version will be posted here with a new date. Questions: MY-EMAIL@example.com
+If this policy changes, the new version will be posted here with a new date. Questions: kovacevicc.ema@gmail.com
