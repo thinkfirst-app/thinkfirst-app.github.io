@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Think First: think before you ask AI</title>
+<meta name="description" content="A free, private tool that has you guess before AI answers, compares the two, and shows how much you rely on AI across your browser, apps, and code editor.">
+<link rel="icon" href="icon.png">
+<style>
+  :root {
+    --bg:#FFFFFF; --band:#F3F5F7; --ink:#1F2A37; --muted:#5B6573; --line:#D5DBE1; --field:#F6F8FA;
+    --mark:#F2C94C; --markSoft:rgba(242,201,76,.38); --good:#1E7F5C;
+    --serif: "Charter", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg:#111820; --band:#17202A; --ink:#E8EDF2; --muted:#9AA6B2; --line:#34404D; --field:#141B24; --mark:#E0B83C; --markSoft:rgba(224,184,60,.28); --good:#4CC38A; }
+  }
+  * { box-sizing: border-box; }
+  :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 var(--sans); }
+  img { max-width: 100%; }
+  a { color: inherit; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 22px; }
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; }
+  .logo { display: flex; gap: 10px; align-items: center; font-family: var(--serif); font-size: 20px; font-weight: 600; text-decoration: none; }
+  .logo img { width: 30px; height: 30px; }
+  nav .links a { color: var(--muted); text-decoration: none; margin-left: 22px; font-size: 15px; }
+  nav .links a:hover { color: var(--ink); }
+  @media (max-width: 600px) { nav .links a:not(:last-child) { display: none; } }
+
+  h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.15; }
+  h1 { font-size: clamp(40px, 6vw, 68px); margin: 0 0 20px; letter-spacing: -0.01em; }
+  h2 { font-size: clamp(28px, 3.6vw, 40px); margin: 0 0 16px; }
+  h3 { font-size: 21px; margin: 0 0 6px; }
+  .lead { font-size: 20px; color: var(--muted); max-width: 34em; margin: 0 0 28px; }
+
+  .hero { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; padding: 40px 0 80px; }
+  @media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 13px 20px; border-radius: 11px; font-weight: 600; font-size: 16px; text-decoration: none; border: 2px solid var(--ink); cursor: pointer; font-family: inherit; }
+  .btn.solid { background: var(--ink); color: var(--bg); }
+  .btn.line { background: transparent; color: var(--ink); }
+  .btn:focus-visible { outline: 3px solid var(--mark); outline-offset: 3px; }
+  .fine { font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  /* the live demo */
+  .demo { background: var(--band); border-radius: 18px; padding: 22px; border: 1px solid var(--line); }
+  .demo .ask { background: var(--bg); border-radius: 12px; padding: 12px 14px; font-size: 15px; margin-bottom: 14px; border: 1px solid var(--line); }
+  .demo .ask small { display: block; color: var(--muted); font-size: 12px; }
+  .card { background: var(--bg); border-radius: 14px; padding: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.12); border-top: 6px solid var(--mark); }
+  .card h4 { margin: 0 0 4px; font-size: 17px; }
+  .card p.sub { margin: 0 0 10px; font-size: 13px; color: var(--muted); }
+  .card textarea { width: 100%; min-height: 76px; resize: vertical; border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; font: inherit; font-size: 15px; background: var(--field); color: var(--ink); }
+  .card textarea:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px var(--markSoft); }
+  .card .row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 8px; flex-wrap: wrap; }
+  .card .row span { font-size: 12px; color: var(--muted); }
+  .card button { font: inherit; font-size: 14px; padding: 8px 14px; border-radius: 9px; border: 1.5px solid var(--ink); background: var(--ink); color: var(--bg); cursor: pointer; }
+  .result { font-size: 14px; }
+  .result .verdict { display: inline-block; font-weight: 600; font-size: 13px; padding: 2px 10px; border-radius: 99px; background: var(--markSoft); margin: 4px 0 8px; }
+  .result ul { margin: 4px 0 8px; padding-left: 18px; }
+  .result b { display: block; }
+
+  section { padding: 80px 0; }
+  .band { background: var(--band); }
+  .parts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 2px solid var(--ink); }
+  @media (max-width: 800px) { .parts { grid-template-columns: 1fr; } }
+  .part { padding: 22px 24px 8px 0; }
+  .part + .part { padding-left: 24px; border-left: 1px solid var(--line); }
+  @media (max-width: 800px) { .part + .part { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); } }
+  .part p { color: var(--muted); margin: 0 0 12px; font-size: 16px; }
+  .part .where { font-size: 13px; color: var(--ink); background: var(--markSoft); display: inline-block; padding: 1px 8px; border-radius: 5px; }
+
+  .shot { border-radius: 14px; border: 1px solid var(--line); box-shadow: 0 20px 50px rgba(0,0,0,.12); display: block; margin-top: 28px; }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 24px; margin-top: 32px; }
+  .facts p { margin: 0; color: var(--muted); font-size: 16px; }
+  .facts b { display: block; color: var(--ink); font-size: 17px; margin-bottom: 4px; }
+
+  .install { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 28px; }
+  @media (max-width: 900px) { .install { grid-template-columns: 1fr; } }
+  .step { background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+  .step ol { padding-left: 20px; margin: 10px 0 16px; color: var(--muted); font-size: 15px; }
+  .step ol li { margin-bottom: 6px; }
+  .step .btn { font-size: 15px; padding: 10px 16px; }
+  .step .opt { font-size: 13px; color: var(--muted); }
+  code { font-size: 14px; background: var(--field); padding: 1px 5px; border-radius: 4px; }
+  .notice { background: var(--markSoft); padding: 12px 14px; border-radius: 10px; font-size: 15px; margin-top: 16px; }
+
+  details { border-bottom: 1px solid var(--line); padding: 16px 0; max-width: 760px; }
+  summary { font-weight: 600; cursor: pointer; font-size: 18px; }
+  details p { color: var(--muted); margin: 10px 0 0; }
+  footer { padding: 40px 0 60px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+  footer a { margin-right: 18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a class="logo" href="#"><img src="icon.png" alt="">Think First</a>
+    <div class="links"><a href="#how">How it works</a><a href="#privacy">Privacy</a><a href="#install">Install</a></div>
+  </nav>
+
+  <div class="hero">
+    <div>
+      <h1>Think first. Then ask AI.</h1>
+      <p class="lead">Think First has you write a quick guess before AI answers, shows you how close you were, and keeps an honest record of how much you rely on AI across your browser, apps, and code.</p>
+      <div class="cta">
+        <a class="btn solid" href="#install">Get it free</a>
+        <a class="btn line" href="#how">See how it works</a>
+      </div>
+      <p class="fine">Free and open source. Runs entirely on your computer. No account.</p>
+    </div>
+
+    <div class="demo" aria-label="Try it">
+      <div class="ask"><small>You're about to ask AI</small>Why does ice float on water?</div>
+      <div class="card" id="demoCard">
+        <h4>What's your guess?</h4>
+        <p class="sub">Try it. One line is plenty.</p>
+        <textarea id="demoGuess" placeholder="I think it's probably… because…"></textarea>
+        <div class="row"><span>This is what appears before you send</span><button id="demoGo">Send with guess</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="band" id="how">
+  <div class="wrap">
+    <h2>Three parts, one honest picture</h2>
+    <p class="lead">Use one, or all three together.</p>
+    <div class="parts">
+      <div class="part">
+        <h3>The guess box</h3>
+        <p>Before a message goes to the AI, you jot down your own guess. When the answer finishes, Think First compares them and shows what you got right and what you missed.</p>
+        <span class="where">Browser extension</span>
+      </div>
+      <div class="part">
+        <h3>The whole-computer tracker</h3>
+        <p>Counts prompts from 9 AI sites and from Claude Code, Codex, and Gemini CLI, plus time spent in apps like ChatGPT and Claude. Goals and alerts keep you to the limits you set.</p>
+        <span class="where">Mac app</span>
+      </div>
+      <div class="part">
+        <h3>The code meter</h3>
+        <p>Estimates how much of the code you write comes from AI suggestions versus your own typing, and warns you past a level you choose.</p>
+        <span class="where">VS Code and Cursor</span>
+      </div>
+    </div>
+    <img class="shot" src="dashboard.png" alt="The Think First dashboard showing prompts per day, top tasks, and guess accuracy" width="1280" height="800" loading="lazy">
+    <div class="facts">
+      <p><b>Where your instincts are strong</b>See your guess score by task, so you know when you can trust yourself and when AI adds real value.</p>
+      <p><b>What you hand off most</b>Every prompt is sorted into tasks like coding, emails, or math, with week-over-week trends.</p>
+      <p><b>Limits you choose</b>Set daily and weekly limits, a think-first target, and AI-free hours. Get a gentle notification when you drift.</p>
+      <p><b>Patterns you'd miss</b>Late-night use, rapid re-asking, your busiest hours, and a plain-language weekly summary.</p>
+    </div>
+  </div>
+</section>
+
+<section id="privacy">
+  <div class="wrap">
+    <h2>Your data never leaves your computer</h2>
+    <p class="lead">There's no Think First server. Your prompts, guesses, and stats are stored in a file on your own machine. You can turn off saving prompt text, export everything, or delete it at any time.</p>
+    <div class="facts">
+      <p><b>Comparisons run on your device</b>Think First uses the AI model built into Chrome, which runs locally and for free. If your computer can't run it, you can add your own API key instead.</p>
+      <p><b>No account, no tracking</b>No sign-up, no analytics, no ads. The code is open source, so anyone can check.</p>
+      <p><b>Built for you, not your boss</b>This is a tool for holding yourself accountable. It has no way to report to anyone else.</p>
+    </div>
+    <p class="fine" style="margin-top:24px"><a href="privacy.html">Read the full privacy policy</a></p>
+  </div>
+</section>
+
+<section class="band" id="install">
+  <div class="wrap">
+    <h2>Install</h2>
+    <p class="lead">Start with the browser extension. Add the others when you want the full picture.</p>
+    <div class="install">
+      <div class="step">
+        <h3>Browser extension</h3>
+        <p class="opt">Chrome, Edge, Brave, Arc</p>
+        <div id="chromeSteps"></div>
+      </div>
+      <div class="step">
+        <h3>Mac app</h3>
+        <p class="opt">macOS 11 or later</p>
+        <ol>
+          <li>Download and open the zip, then drag Think First into Applications.</li>
+          <li>Open it. If macOS says it can't verify the app, open System Settings, go to Privacy &amp; Security, and click Open Anyway.</li>
+          <li>If asked to install Command Line Tools, accept, then open Think First again.</li>
+        </ol>
+        <a class="btn solid" data-dl="Think-First-Mac.zip" href="#">Download for Mac</a>
+      </div>
+      <div class="step">
+        <h3>VS Code and Cursor</h3>
+        <p class="opt">Optional, for people who code</p>
+        <div id="codeSteps"></div>
+      </div>
+    </div>
+    <p class="notice" id="repoNotice" hidden>Downloads appear here once this site is published from its GitHub repository.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Questions</h2>
+    <details><summary>Is it really free?</summary><p>Yes. Think First is free and open source. The optional API key route costs a fraction of a cent per comparison, billed by the AI provider to your own account.</p></details>
+    <details><summary>Which AI tools does it work with?</summary><p>The guess box works on Claude, ChatGPT, and Gemini. Prompt counting also covers Perplexity, Microsoft Copilot, DeepSeek, Grok, Mistral Le Chat, and Poe. The Mac app counts Claude Code, Codex CLI, and Gemini CLI, and time in desktop AI apps.</p></details>
+    <details><summary>Will it slow me down?</summary><p>You can skip any guess with Esc, set a minimum message length, or only be asked on tasks you use AI for often. Most people find one line of thinking takes a few seconds and changes how they read the answer.</p></details>
+    <details><summary>What can't it see?</summary><p>Prompts typed inside desktop apps (only time is counted there), chat panels inside code editors, and browsers without the extension, such as Safari and Firefox.</p></details>
+    <details><summary>Does it work on Windows?</summary><p>The browser and VS Code extensions do. The whole-computer tracker runs on Windows and Linux with Python, but there's no one-click installer for them yet.</p></details>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer>
+    <a href="privacy.html">Privacy</a><a id="srcLink" href="#">Source code</a><span>Think First is open source under the MIT license.</span>
+  </footer>
+</div>
+
+<script>
+// Fill these in after publishing, or leave blank. On GitHub Pages the repository is detected automatically.
+const CONFIG = {
+  repo: "",            // e.g. "yourname/think-first"
+  chromeStoreUrl: "",  // Chrome Web Store link once approved
+  vscodeUrl: ""        // VS Code Marketplace link once published
+};
+
+function detectRepo() {
+  if (CONFIG.repo) return CONFIG.repo;
+  const m = location.hostname.match(/^([^.]+)\.github\.io$/i);
+  if (!m) return null;
+  const first = location.pathname.split("/").filter(Boolean)[0];
+  return `${m[1]}/${first && !first.endsWith(".html") ? first : m[1] + ".github.io"}`;
+}
+const repo = detectRepo();
+const dl = file => repo ? `https://github.com/${repo}/releases/latest/download/${file}` : null;
+
+document.querySelectorAll("[data-dl]").forEach(a => {
+  const url = dl(a.dataset.dl);
+  if (url) a.href = url; else a.removeAttribute("href");
+});
+if (!repo) document.getElementById("repoNotice").hidden = false;
+if (repo) document.getElementById("srcLink").href = `https://github.com/${repo}`;
+else document.getElementById("srcLink").remove();
+
+document.getElementById("chromeSteps").innerHTML = CONFIG.chromeStoreUrl
+  ? `<ol><li>Click the button and choose Add to Chrome.</li><li>Pin Think First from the puzzle-piece menu.</li><li>Reload any open AI chat tabs.</li></ol>
+     <a class="btn solid" href="${CONFIG.chromeStoreUrl}">Add to Chrome</a>`
+  : `<ol><li>Download the zip and unzip it.</li><li>Open <code>chrome://extensions</code> and turn on Developer mode.</li><li>Click Load unpacked and choose the unzipped folder.</li></ol>
+     <a class="btn solid" ${dl("Think-First-Chrome-1.0.0.zip") ? `href="${dl("Think-First-Chrome-1.0.0.zip")}"` : ""}>Download extension</a>`;
+
+document.getElementById("codeSteps").innerHTML = CONFIG.vscodeUrl
+  ? `<ol><li>Open the Marketplace page and click Install.</li><li>Look for "AI 0% today" in the status bar.</li></ol><a class="btn solid" href="${CONFIG.vscodeUrl}">Get the extension</a>`
+  : `<ol><li>Download the .vsix file.</li><li>In VS Code or Cursor, press Cmd+Shift+P and run Extensions: Install from VSIX.</li><li>Look for "AI 0% today" in the status bar.</li></ol>
+     <a class="btn solid" ${dl("think-first-tracker-1.0.0.vsix") ? `href="${dl("think-first-tracker-1.0.0.vsix")}"` : ""}>Download for VS Code</a>`;
+
+// Live demo of the guess box
+document.getElementById("demoGo").addEventListener("click", () => {
+  const guess = document.getElementById("demoGuess").value.trim();
+  if (!guess) { document.getElementById("demoGuess").focus(); return; }
+  const g = guess.toLowerCase();
+  const dense = /dens|lighter|less heavy|weigh/.test(g), bonds = /hydrogen|bond|crystal|lattice|structure|expand/.test(g);
+  const verdict = dense && bonds ? "Your guess matched" : dense || bonds ? "Partly there" : "Different from the answer";
+  const right = [dense && "Ice is less dense than liquid water, so it floats", bonds && "Its structure is the key: hydrogen bonds hold molecules in an open lattice"].filter(Boolean);
+  const missed = [!dense && "Floating comes down to density: ice is about 9% less dense than water", !bonds && "Hydrogen bonds lock frozen water into an open crystal that takes up more space"].filter(Boolean);
+  const card = document.getElementById("demoCard");
+  const esc = s => s.replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  card.innerHTML = `<h4>Your guess</h4><p class="sub">${esc(guess)}</p>
+    <div class="result"><span class="verdict">${verdict}</span>
+    ${right.length ? `<b>You got right</b><ul>${right.map(x => `<li>${x}</li>`).join("")}</ul>` : ""}
+    ${missed.length ? `<b>What the answer adds</b><ul>${missed.map(x => `<li>${x}</li>`).join("")}</ul>` : ""}
+    <p style="margin:6px 0 0;color:var(--muted)">This is what you'd see after the real answer finishes.</p></div>`;
+});
+document.getElementById("demoGuess").addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); document.getElementById("demoGo").click(); }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  :root { --paper:#FFFFFF; --ink:#1F2A37; --muted:#5B6573; --line:#CBD2DA; --field:#F6F8FA; --mark:#F2C94C; --markSoft:rgba(242,201,76,.35); --bad:#B42318; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#1B2430; --ink:#E8EDF2; --muted:#9AA6B2; --line:#3A4654; --field:#141B24; --mark:#E0B83C; --markSoft:rgba(224,184,60,.25); --bad:#F97066; } }
+  * { box-sizing: border-box; }
+  body { width: 360px; margin: 0; padding: 16px; background: var(--paper); color: var(--ink); font: 14px/1.45 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; border-top: 5px solid var(--mark); }
+  h1 { font-size: 17px; margin: 0 0 2px; }
+  .sub { color: var(--muted); font-size: 12px; margin: 0 0 12px; }
+  .tabs { display: flex; gap: 4px; border-bottom: 1.5px solid var(--line); margin-bottom: 12px; }
+  .tabs button { border: none; border-radius: 0; background: none; padding: 6px 10px; margin-bottom: -1.5px; color: var(--muted); border-bottom: 2.5px solid transparent; }
+  .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--mark); font-weight: 600; }
+  .total { font-size: 13px; margin: 0 0 10px; }
+  .total b { font-size: 22px; margin-right: 4px; }
+  .bar { margin: 0 0 8px; }
+  .bar .top { display: flex; justify-content: space-between; font-size: 13px; }
+  .bar .track { height: 7px; background: var(--field); border-radius: 4px; overflow: hidden; margin-top: 3px; }
+  .bar .fill { height: 100%; background: var(--line); border-radius: 4px; }
+  .bar.frequent .fill { background: var(--mark); }
+  .flag { font-size: 11px; font-weight: 600; background: var(--markSoft); padding: 0 6px; border-radius: 4px; margin-left: 6px; }
+  .delta { color: var(--muted); font-size: 12px; }
+  .empty { color: var(--muted); font-size: 13px; }
+  .stats { display: flex; gap: 14px; margin-bottom: 12px; }
+  .stats div { font-size: 12px; color: var(--muted); }
+  .stats b { display: block; font-size: 20px; color: var(--ink); }
+  ol { list-style: none; margin: 0; padding: 0; max-height: 220px; overflow: auto; }
+  li { padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
+  li .g { color: var(--ink); }
+  li .m { color: var(--muted); }
+  label { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
+  .check { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--ink); margin: 8px 0; }
+  input[type=text], input[type=password], input[type=number], select { width: 100%; padding: 7px 9px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--field); color: var(--ink); font: inherit; font-size: 13px; }
+  button { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 8px; border: 1.5px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; }
+  button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .ai { background: var(--field); border-radius: 10px; padding: 10px 12px; font-size: 13px; margin-bottom: 6px; }
+  .ai p { margin: 0 0 8px; }
+  .row { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+  .saved { font-size: 12px; color: var(--muted); }
+  details { margin-top: 10px; font-size: 13px; }
+  summary { cursor: pointer; color: var(--muted); }
+</style>
+</head>
+<body>
+  <h1>Think First</h1>
+  <p class="sub">Think before you read the answer.</p>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="habits">Your AI habits</button>
+    <button role="tab" aria-selected="false" data-tab="guesses">Guesses</button>
+    <button role="tab" aria-selected="false" data-tab="settings">Settings</button>
+  </div>
+
+  <div class="ai" id="hubBox">
+    <p id="hubStatus">Checking for the desktop app…</p>
+    <button id="openDash" class="primary" hidden>Open full dashboard</button>
+  </div>
+
+  <section id="habits">
+    <p class="total"><b id="weekTotal">0</b>requests to AI in the last 7 days <span class="delta" id="weekDelta"></span></p>
+    <p class="total" id="timeLine"></p>
+    <div id="bars"></div>
+  </section>
+
+  <section id="guesses" hidden>
+    <div class="stats">
+      <div><b id="total">0</b>guesses</div>
+      <div><b id="match">–</b>matched</div>
+      <div><b id="partial">–</b>partly</div>
+      <div><b id="diff">–</b>different</div>
+    </div>
+    <ol id="history"></ol>
+  </section>
+
+  <section id="settings" hidden>
+    <div class="ai">
+      <p id="aiStatus">Checking the built-in AI…</p>
+      <button id="setupAI" class="primary" hidden>Turn on built-in AI</button>
+    </div>
+    <details id="keyBox">
+      <summary>Use an Anthropic API key instead</summary>
+      <label for="apiKey">API key (stored only in this browser)</label>
+      <input type="password" id="apiKey" placeholder="sk-ant-…">
+      <label for="model">Model</label>
+      <input type="text" id="model">
+      <label class="check"><input type="checkbox" id="preferKey"> Use the API key even when built-in AI is available</label>
+    </details>
+
+    <label class="check"><input type="checkbox" id="enabled"> Ask for a guess before sending</label>
+    <label for="askMode">When to ask</label>
+    <select id="askMode">
+      <option value="always">Every message</option>
+      <option value="frequent">Only for tasks I ask AI about often</option>
+    </select>
+    <label for="minLength">Skip messages shorter than (characters)</label>
+    <input type="number" id="minLength" min="0" max="500">
+    <label class="check"><input type="checkbox" id="trackUsage"> Count what kinds of tasks I ask AI for</label>
+    <label class="check"><input type="checkbox" id="aiSort"> Use AI to sort tasks (more accurate than keywords)</label>
+
+    <div class="row"><button id="save" class="primary">Save settings</button><span class="saved" id="savedMsg"></span></div>
+    <div class="row"><button id="export">Export my data</button><button id="clear">Delete my data</button></div>
+  </section>
+
+  <script src="ai.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

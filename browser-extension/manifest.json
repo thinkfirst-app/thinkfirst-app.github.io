@@ -1,0 +1,69 @@
+{
+  "manifest_version": 3,
+  "name": "Think First",
+  "version": "1.0.0",
+  "description": "Guess before the AI answers, compare automatically, and track how you use AI.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://api.anthropic.com/*",
+    "http://127.0.0.1:47321/*"
+  ],
+  "action": {
+    "default_title": "Think First",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "32": "icon32.png",
+      "48": "icon48.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://claude.ai/*",
+        "https://chatgpt.com/*",
+        "https://gemini.google.com/*",
+        "https://www.perplexity.ai/*",
+        "https://perplexity.ai/*",
+        "https://copilot.microsoft.com/*",
+        "https://chat.deepseek.com/*",
+        "https://grok.com/*",
+        "https://chat.mistral.ai/*",
+        "https://poe.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "ui.html",
+        "ui.js",
+        "ai.js"
+      ],
+      "matches": [
+        "https://claude.ai/*",
+        "https://chatgpt.com/*",
+        "https://gemini.google.com/*",
+        "https://www.perplexity.ai/*",
+        "https://perplexity.ai/*",
+        "https://copilot.microsoft.com/*",
+        "https://chat.deepseek.com/*",
+        "https://grok.com/*",
+        "https://chat.mistral.ai/*",
+        "https://poe.com/*"
+      ]
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "32": "icon32.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

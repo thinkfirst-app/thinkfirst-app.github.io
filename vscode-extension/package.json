@@ -1,0 +1,50 @@
+{
+  "name": "think-first-tracker",
+  "displayName": "Think First: AI Usage Tracker",
+  "description": "Estimates how much of your code comes from AI suggestions versus your own typing, and reports it to the Think First hub.",
+  "version": "1.0.0",
+  "publisher": "thinkfirst",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR-GITHUB-USERNAME/think-first"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "thinkFirst.openDashboard",
+        "title": "Think First: Open Dashboard"
+      },
+      {
+        "command": "thinkFirst.showToday",
+        "title": "Think First: Show Today's AI Share"
+      }
+    ],
+    "configuration": {
+      "title": "Think First",
+      "properties": {
+        "thinkFirst.hubUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:47321",
+          "description": "Address of the Think First hub."
+        },
+        "thinkFirst.aiShareWarning": {
+          "type": "number",
+          "default": 60,
+          "description": "Warn when more than this percent of today's code came from AI (0 = never)."
+        }
+      }
+    }
+  },
+  "icon": "icon.png"
+}

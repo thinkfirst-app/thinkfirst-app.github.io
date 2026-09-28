@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Think First: your AI use</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✏️</text></svg>">
+<style>
+  :root {
+    --bg:#F3F5F7; --paper:#FFFFFF; --ink:#1F2A37; --muted:#5B6573; --line:#D5DBE1; --field:#F6F8FA;
+    --mark:#F2C94C; --markSoft:rgba(242,201,76,.38); --bad:#B42318; --good:#1E7F5C;
+    --browser:#3B6EA8; --cli:#7E57C2; --desktop:#C07A2C; --vscode:#2E8B7A;
+    --serif: "Charter", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#111820; --paper:#1B2430; --ink:#E8EDF2; --muted:#9AA6B2; --line:#34404D; --field:#141B24;
+      --mark:#E0B83C; --markSoft:rgba(224,184,60,.28); --bad:#F97066; --good:#4CC38A;
+      --browser:#6C9BD2; --cli:#A58AE0; --desktop:#E0A15A; --vscode:#52B8A5; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--sans); }
+  main { max-width: 1120px; margin: 0 auto; padding: 28px 20px 80px; }
+  h1, h2 { font-family: var(--serif); font-weight: 600; }
+  h2 { font-size: 21px; margin: 0 0 12px; }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .brand { font-family: var(--serif); font-size: 18px; margin: 0; }
+  .seg { display: inline-flex; background: var(--paper); border: 1.5px solid var(--line); border-radius: 10px; padding: 3px; }
+  .seg button { border: 0; background: none; padding: 6px 12px; border-radius: 7px; font: inherit; font-size: 14px; color: var(--muted); cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+  .hero { margin: 34px 0 30px; }
+  .hero p { font-family: var(--serif); font-size: clamp(26px, 4vw, 40px); line-height: 1.2; margin: 0 0 16px; max-width: 30ch; }
+  .hero mark { background: linear-gradient(transparent 55%, var(--markSoft) 55%); color: inherit; padding: 0 2px; }
+  .hero .over { color: var(--bad); }
+  .meter { height: 12px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 99px; overflow: hidden; max-width: 560px; }
+  .meter i { display: block; height: 100%; background: var(--mark); }
+  .meter.over i { background: var(--bad); }
+  .meterlabel { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+  .nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--line); margin-bottom: 34px; }
+  .num { padding: 14px 14px 14px 0; }
+  .num b { display: block; font-family: var(--serif); font-size: 30px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .num span { font-size: 13px; color: var(--muted); }
+  .num small { display: block; font-size: 12px; color: var(--muted); }
+  .num small.up { color: var(--bad); } .num small.down { color: var(--good); }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  section.box { background: var(--paper); border-radius: 14px; padding: 20px; border: 1px solid var(--line); }
+  .wide { grid-column: 1 / -1; }
+  .note { font-size: 13px; color: var(--muted); margin: -6px 0 12px; }
+
+  .insights { margin: 0; padding: 0; list-style: none; }
+  .insights li { padding: 9px 0 9px 16px; border-bottom: 1px solid var(--line); position: relative; }
+  .insights li::before { content: ""; position: absolute; left: 0; top: 17px; width: 7px; height: 7px; border-radius: 2px; background: var(--mark); }
+  .insights li:last-child { border-bottom: 0; }
+
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); margin-bottom: 8px; flex-wrap: wrap; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+  .chart { overflow-x: auto; }
+  svg text { fill: var(--muted); font: 11px var(--sans); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-weight: 500; color: var(--muted); font-size: 12px; padding: 6px 8px 6px 0; border-bottom: 1.5px solid var(--line); }
+  td { padding: 8px 8px 8px 0; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  td.n { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .bar { height: 8px; background: var(--field); border-radius: 4px; min-width: 60px; position: relative; overflow: visible; }
+  .bar i { display: block; height: 100%; border-radius: 4px; background: var(--line); }
+  .bar i.hot { background: var(--mark); } .bar i.over { background: var(--bad); }
+  .bar .cap { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); }
+  .tag { font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; background: var(--markSoft); margin-left: 6px; white-space: nowrap; }
+  .tag.bad { background: rgba(180,35,24,.14); color: var(--bad); }
+  .up { color: var(--bad); } .down { color: var(--good); }
+
+  .heat { display: grid; grid-template-columns: 34px repeat(24, 1fr); gap: 2px; font-size: 10px; color: var(--muted); }
+  .heat div { aspect-ratio: 1; border-radius: 3px; background: var(--field); }
+  .heat .lbl { background: none; aspect-ratio: auto; display: flex; align-items: center; }
+  .heat .hl { background: none; aspect-ratio: auto; text-align: center; }
+
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+  .split { display: flex; height: 22px; border-radius: 6px; overflow: hidden; margin: 6px 0 4px; background: var(--field); }
+  .split i { display: block; height: 100%; }
+
+  .log { max-height: 420px; overflow: auto; }
+  .log td.t { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  .log td.q { max-width: 520px; }
+  .filters { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  input, select { font: inherit; font-size: 14px; padding: 7px 10px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--field); color: var(--ink); }
+  input:focus, select:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px var(--markSoft); }
+  button.act { font: inherit; font-size: 14px; padding: 8px 14px; border-radius: 9px; border: 1.5px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; }
+  button.ghost { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 8px; border: 1.5px solid var(--line); background: none; color: var(--ink); cursor: pointer; }
+  button:focus-visible { outline: 3px solid var(--mark); outline-offset: 2px; }
+
+  form.goals { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px 20px; }
+  form.goals label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  form.goals input[type=number], form.goals input[type=time], form.goals input[type=text] { width: 100%; }
+  .check { display: flex; gap: 8px; align-items: center; font-size: 14px; color: var(--ink) !important; }
+  .rowline { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; flex-wrap: wrap; }
+  .rowline input[type=time] { width: auto; }
+  .empty { color: var(--muted); font-size: 14px; }
+  .offline { background: var(--markSoft); padding: 12px 14px; border-radius: 10px; margin: 20px 0; }
+  .alerts li { padding: 6px 0; border-bottom: 1px solid var(--line); list-style: none; font-size: 14px; }
+  .alerts { margin: 0; padding: 0; max-height: 260px; overflow: auto; }
+  .alerts span { color: var(--muted); font-size: 12px; margin-right: 8px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <p class="brand">Think First</p>
+    <div class="seg" role="group" aria-label="Time range">
+      <button data-days="1">Today</button>
+      <button data-days="7" aria-pressed="true">7 days</button>
+      <button data-days="30">30 days</button>
+      <button data-days="90">90 days</button>
+    </div>
+  </div>
+
+  <div id="offline" class="offline" hidden>Can't reach the Think First hub. Make sure <code>thinkfirst.py</code> is running, then reload this page.</div>
+
+  <div class="hero">
+    <p id="statement">Loading your AI use…</p>
+    <div class="meter" id="meter" hidden><i></i></div>
+    <div class="meterlabel" id="meterlabel"></div>
+  </div>
+
+  <div class="nums" id="nums"></div>
+
+  <div class="grid">
+    <section class="box wide">
+      <h2>What stands out</h2>
+      <ul class="insights" id="insights"></ul>
+    </section>
+
+    <section class="box wide">
+      <h2>Prompts per day</h2>
+      <div class="legend" id="legend"></div>
+      <div class="chart" id="daily"></div>
+    </section>
+
+    <section class="box wide">
+      <h2>What you ask AI for</h2>
+      <p class="note">Marked tasks are ones you used AI for 5+ times in the last 7 days. The black tick is your weekly limit. Guess score counts a match as 1 and partly right as 0.5.</p>
+      <div id="cats"></div>
+    </section>
+
+    <section class="box">
+      <h2>When you use AI</h2>
+      <p class="note">Prompts by weekday and hour.</p>
+      <div id="heat"></div>
+    </section>
+
+    <section class="box">
+      <h2>Where you use AI</h2>
+      <div id="tools"></div>
+    </section>
+
+    <section class="box">
+      <h2>In your code editor</h2>
+      <p class="note">Estimated from what gets inserted into your files: characters you typed versus multi-line or long suggestions accepted from AI. Pastes are excluded.</p>
+      <div id="code"></div>
+    </section>
+
+    <section class="box">
+      <h2>Alerts</h2>
+      <ul class="alerts" id="alerts"></ul>
+    </section>
+
+    <section class="box wide">
+      <h2>Every prompt</h2>
+      <div class="filters">
+        <input id="q" type="search" placeholder="Search your prompts" aria-label="Search your prompts">
+        <select id="catFilter" aria-label="Filter by task"><option value="">All tasks</option></select>
+      </div>
+      <div class="log" id="log"></div>
+    </section>
+
+    <section class="box wide">
+      <h2>Goals</h2>
+      <p class="note">Set limits you want to be held to. You'll get a notification when you get close or go over, and every alert is kept above.</p>
+      <form class="goals" id="goals">
+        <div><label for="daily_limit">Daily prompt limit (0 = off)</label><input type="number" min="0" id="daily_limit"></div>
+        <div><label for="app_minutes_limit">Daily minutes in AI apps and sites (0 = off)</label><input type="number" min="0" id="app_minutes_limit"></div>
+        <div><label for="think_first_target">Think-first target (% of browser prompts with a guess)</label><input type="number" min="0" max="100" id="think_first_target"></div>
+        <div><label for="digest_time">Daily summary notification at</label><input type="time" id="digest_time"></div>
+        <div class="wide" style="grid-column:1/-1">
+          <label>Weekly limits per task (0 = off)</label>
+          <div id="catLimits" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px 16px"></div>
+        </div>
+        <div style="grid-column:1/-1">
+          <label>AI-free blocks (you'll be notified if you use AI during these)</label>
+          <div id="freeBlocks"></div>
+          <button type="button" class="ghost" id="addBlock">Add a block</button>
+        </div>
+        <div style="grid-column:1/-1">
+          <label for="ai_apps">Desktop apps that count as AI (comma separated, exact app names)</label>
+          <input type="text" id="ai_apps">
+        </div>
+        <div>
+          <label class="check"><input type="checkbox" id="notify"> Show desktop notifications</label>
+          <label class="check"><input type="checkbox" id="store_text"> Save the text of prompts</label>
+        </div>
+        <div>
+          <label class="check"><input type="checkbox" id="track_apps"> Track time in AI desktop apps</label>
+          <label class="check"><input type="checkbox" id="import_cli"> Count prompts from Claude Code, Codex, and Gemini CLI</label>
+        </div>
+        <div style="grid-column:1/-1;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button class="act" type="submit">Save goals</button>
+          <span id="saved" class="note" style="margin:0"></span>
+          <span style="flex:1"></span>
+          <button type="button" class="ghost" id="clearAll">Delete all data</button>
+          <button type="button" class="ghost" id="stopApp">Stop and uninstall</button>
+        </div>
+      </form>
+    </section>
+  </div>
+</main>
+
+<script>
+const CATS = ["Coding & debugging","Writing & editing","Emails & messages","Math & numbers","Summarizing","Learning & explanations","Facts & research","Advice & decisions","Brainstorming","Translation","Health","Other"];
+const SOURCES = { browser: "Browser", cli: "Command line", desktop: "Desktop apps", vscode: "Code editor" };
+const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+let range = 7, data = null;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const pct = (a, b) => b ? Math.round(100 * a / b) : 0;
+const mins = m => { m = Math.round(m); return m >= 60 ? `${Math.floor(m/60)} h ${m%60} min` : `${m} min`; };
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const api = (path, opts) => fetch(path, opts).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+
+document.querySelectorAll("[data-days]").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("[data-days]").forEach(x => x.setAttribute("aria-pressed", x === b));
+  range = +b.dataset.days; load();
+}));
+
+async function load() {
+  try {
+    data = await api(`/api/summary?days=${range}`);
+    $("offline").hidden = true;
+  } catch { $("offline").hidden = false; return; }
+  renderHero(); renderNums(); renderInsights(); renderDaily(); renderCats(); renderHeat(); renderTools(); renderCode(); renderAlerts(); loadLog();
+  if (!load.formDone) { renderGoals(); load.formDone = true; }
+}
+
+function renderHero() {
+  const t = data.today, s = data.settings;
+  let text;
+  if (!t.prompts && !t.minutes) text = "You haven't used AI yet today.";
+  else {
+    text = `Today you've asked AI <mark>${t.prompts} ${t.prompts === 1 ? "time" : "times"}</mark>`;
+    if (s.daily_limit) {
+      const left = s.daily_limit - t.prompts;
+      text += left >= 0 ? `, with ${left} left in your budget.` : `, <span class="over">${-left} over your limit</span>.`;
+    } else text += t.minutes ? ` and spent ${mins(t.minutes)} in AI apps.` : ".";
+  }
+  $("statement").innerHTML = text;
+  const meter = $("meter");
+  if (s.daily_limit) {
+    meter.hidden = false;
+    meter.classList.toggle("over", t.prompts > s.daily_limit);
+    meter.firstElementChild.style.width = Math.min(100, pct(t.prompts, s.daily_limit)) + "%";
+    $("meterlabel").textContent = `${t.prompts} of ${s.daily_limit} prompts` + (s.app_minutes_limit ? `, ${mins(t.minutes)} of ${mins(s.app_minutes_limit)} in AI apps` : "");
+  } else {
+    meter.hidden = true;
+    $("meterlabel").textContent = "Set a daily limit under Goals to track a budget.";
+  }
+}
+
+function change(cur, prev, lowerIsBetter = true) {
+  if (!prev) return "";
+  const d = pct(cur - prev, prev);
+  if (!d) return `<small>same as before</small>`;
+  const cls = (d > 0) === lowerIsBetter ? "up" : "down";
+  return `<small class="${cls}">${d > 0 ? "+" : ""}${d}% vs. previous ${range} ${range === 1 ? "day" : "days"}</small>`;
+}
+
+function renderNums() {
+  const t = data.totals, c = data.code, s = data.settings;
+  const judged = t.match + t.partial + t.different;
+  const codeTotal = c.typed + c.ai, prevCodeTotal = data.prev_code.typed + data.prev_code.ai;
+  const cells = [
+    [t.prompts, "prompts", change(t.prompts, t.prev_prompts)],
+    [t.guessable ? pct(t.guessed, t.guessable) + "%" : "–", "think-first rate", `<small>target ${s.think_first_target}%</small>`],
+    [judged ? Math.round(100 * (t.match + 0.5 * t.partial) / judged) + "%" : "–", "guess score", `<small>${judged} compared</small>`],
+    [mins(t.minutes), "in AI apps and sites", change(t.minutes, t.prev_minutes)],
+    [codeTotal ? pct(c.ai, codeTotal) + "%" : "–", "of editor code from AI", prevCodeTotal ? `<small>was ${pct(data.prev_code.ai, prevCodeTotal)}%</small>` : ""],
+    [data.streak == null ? "–" : data.streak, data.streak === 1 ? "day within goals" : "days within goals", data.streak == null ? "<small>set a limit to start</small>" : ""]
+  ];
+  $("nums").innerHTML = cells.map(([v, l, x]) => `<div class="num"><b>${v}</b><span>${l}</span>${x}</div>`).join("");
+}
+
+function renderInsights() {
+  $("insights").innerHTML = data.insights.map(i => `<li>${esc(i)}</li>`).join("");
+}
+
+function renderDaily() {
+  const days = data.daily, keys = Object.keys(SOURCES);
+  $("legend").innerHTML = keys.map(k => `<span><i style="background:var(--${k})"></i>${SOURCES[k]}</span>`).join("")
+    + (data.settings.daily_limit ? `<span><i style="background:var(--bad);height:2px;vertical-align:3px"></i>Daily limit</span>` : "");
+  const max = Math.max(1, data.settings.daily_limit || 0, ...days.map(d => d.prompts));
+  const W = Math.max($("daily").clientWidth || 800, days.length * 16), H = 200, pad = 26, bw = (W - pad) / days.length;
+  let svg = `<svg viewBox="0 0 ${W} ${H + 24}" width="${W}" height="${H + 24}" role="img" aria-label="Prompts per day">`;
+  [0, 0.5, 1].forEach(f => { const y = H - f * (H - 10); svg += `<line x1="${pad}" x2="${W}" y1="${y}" y2="${y}" stroke="${cssVar("--line")}" stroke-width="1"/><text x="0" y="${y + 4}">${Math.round(max * f)}</text>`; });
+  days.forEach((d, i) => {
+    let y = H; const x = pad + i * bw + bw * 0.15, w = bw * 0.7;
+    keys.forEach(k => {
+      const n = d.by_source[k] || 0; if (!n) return;
+      const h = n / max * (H - 10); y -= h;
+      svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="${cssVar("--" + k)}"><title>${d.label}: ${n} ${SOURCES[k].toLowerCase()}</title></rect>`;
+    });
+    const every = Math.ceil(days.length / 14);
+    if (i % every === 0) svg += `<text x="${x + w / 2}" y="${H + 16}" text-anchor="middle">${range > 7 ? d.date.slice(5) : d.label}</text>`;
+  });
+  if (data.settings.daily_limit) {
+    const y = H - data.settings.daily_limit / max * (H - 10);
+    svg += `<line x1="${pad}" x2="${W}" y1="${y}" y2="${y}" stroke="${cssVar("--bad")}" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  }
+  $("daily").innerHTML = svg + "</svg>";
+}
+
+function renderCats() {
+  const cats = data.categories.filter(c => c.count || c.prev);
+  if (!cats.length) { $("cats").innerHTML = `<p class="empty">No prompts in this period.</p>`; return; }
+  const limits = data.settings.category_limits || {};
+  const max = Math.max(...cats.map(c => Math.max(c.count, (limits[c.name] || 0))));
+  const rows = cats.map(c => {
+    const week = data.week_counts[c.name] || 0, lim = limits[c.name] || 0;
+    const frequent = week >= 5 && c.name !== "Other", over = lim && week >= lim;
+    const judged = c.match + c.partial + c.different;
+    const score = judged ? Math.round(100 * (c.match + 0.5 * c.partial) / judged) + "%" : "–";
+    const d = c.prev ? pct(c.count - c.prev, c.prev) : null;
+    return `<tr>
+      <td>${esc(c.name)}${over ? `<span class="tag bad">Over limit</span>` : frequent ? `<span class="tag">Frequent</span>` : ""}</td>
+      <td style="width:34%"><div class="bar"><i class="${over ? "over" : frequent ? "hot" : ""}" style="width:${pct(c.count, max)}%"></i>${lim ? `<span class="cap" style="left:${pct(lim, max)}%" title="Weekly limit ${lim}"></span>` : ""}</div></td>
+      <td class="n">${c.count}</td>
+      <td class="n ${d > 0 ? "up" : d < 0 ? "down" : ""}">${d == null ? "new" : (d > 0 ? "+" : "") + d + "%"}</td>
+      <td class="n">${pct(c.count, data.totals.prompts)}%</td>
+      <td class="n">${c.guessed}</td>
+      <td class="n">${score}</td></tr>`;
+  }).join("");
+  $("cats").innerHTML = `<div style="overflow-x:auto"><table><thead><tr><th>Task</th><th></th><th>Prompts</th><th>Change</th><th>Share</th><th>Guessed</th><th>Guess score</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function renderHeat() {
+  const h = data.heatmap, max = Math.max(1, ...h.flat());
+  let html = `<div class="heat"><span class="lbl"></span>`;
+  for (let i = 0; i < 24; i++) html += `<span class="hl">${i % 6 === 0 ? (i % 12 || 12) + (i < 12 ? "a" : "p") : ""}</span>`;
+  h.forEach((row, d) => {
+    html += `<span class="lbl">${DAYS[d]}</span>`;
+    row.forEach((n, hr) => html += `<div title="${DAYS[d]} ${hr}:00, ${n} prompts" style="${n ? `background:${cssVar("--mark")};opacity:${0.18 + 0.82 * n / max}` : ""}"></div>`);
+  });
+  $("heat").innerHTML = html + "</div>";
+}
+
+function renderTools() {
+  const tools = data.tools;
+  if (!tools.length) { $("tools").innerHTML = `<p class="empty">Nothing recorded yet.</p>`; return; }
+  $("tools").innerHTML = `<table><thead><tr><th>Tool</th><th>Prompts</th><th>Active time</th></tr></thead><tbody>${tools.map(t =>
+    `<tr><td><span class="dot" style="background:var(--${t.source})"></span>${esc(t.tool)}</td><td class="n">${t.prompts || "–"}</td><td class="n">${t.minutes ? mins(t.minutes) : "–"}</td></tr>`).join("")}</tbody></table>`;
+}
+
+function renderCode() {
+  const c = data.code, total = c.typed + c.ai;
+  if (!total) { $("code").innerHTML = `<p class="empty">No editor activity yet. Install the VS Code extension to track this.</p>`; return; }
+  const langs = Object.entries(c.by_lang).sort((a, b) => (b[1].typed + b[1].ai) - (a[1].typed + a[1].ai)).slice(0, 6);
+  $("code").innerHTML = `
+    <div class="split"><i style="width:${pct(c.ai, total)}%;background:var(--mark)"></i><i style="width:${pct(c.typed, total)}%;background:var(--vscode)"></i></div>
+    <div class="legend"><span><i style="background:var(--mark)"></i>From AI: ${c.ai.toLocaleString()} characters (${c.insertions} suggestions)</span><span><i style="background:var(--vscode)"></i>Typed by you: ${c.typed.toLocaleString()}</span></div>
+    <table><thead><tr><th>Language</th><th>AI share</th><th>Characters</th></tr></thead><tbody>${langs.map(([l, v]) =>
+      `<tr><td>${esc(l)}</td><td class="n">${pct(v.ai, v.ai + v.typed)}%</td><td class="n">${(v.ai + v.typed).toLocaleString()}</td></tr>`).join("")}</tbody></table>`;
+}
+
+function renderAlerts() {
+  const a = data.alerts;
+  $("alerts").innerHTML = a.length ? a.map(x => `<li><span>${new Date(x.ts * 1000).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</span><b>${esc(x.title)}.</b> ${esc(x.body)}</li>`).join("")
+    : `<li class="empty">No alerts yet. They'll appear here when you approach or pass a goal.</li>`;
+}
+
+let logTimer;
+async function loadLog() {
+  const qs = new URLSearchParams({ limit: 300, q: $("q").value, category: $("catFilter").value });
+  const rows = await api(`/api/events?${qs}`);
+  const verdict = { match: "matched", partial: "partly", different: "different" };
+  $("log").innerHTML = rows.length ? `<table><thead><tr><th>When</th><th>Tool</th><th>Task</th><th>Prompt</th><th>Guess</th></tr></thead><tbody>${rows.map(r => `<tr>
+    <td class="t">${new Date(r.ts * 1000).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</td>
+    <td>${esc(r.tool)}</td><td>${esc(r.category)}</td>
+    <td class="q">${r.text ? esc(r.text.length > 160 ? r.text.slice(0, 160) + "…" : r.text) : `<span class="empty">not saved</span>`}</td>
+    <td class="t">${r.guessed ? (verdict[r.verdict] || "guessed") : ""}</td></tr>`).join("")}</tbody></table>` : `<p class="empty">No prompts match.</p>`;
+}
+$("q").addEventListener("input", () => { clearTimeout(logTimer); logTimer = setTimeout(loadLog, 250); });
+$("catFilter").addEventListener("change", loadLog);
+$("catFilter").innerHTML += CATS.map(c => `<option>${esc(c)}</option>`).join("");
+
+// ---------- Goals form ----------
+function blockRow(b = { days: [0,1,2,3,4], start: "09:00", end: "11:00" }) {
+  const div = document.createElement("div");
+  div.className = "rowline";
+  div.innerHTML = DAYS.map((d, i) => `<label class="check" style="font-size:13px"><input type="checkbox" value="${i}" ${b.days.includes(i) ? "checked" : ""}>${d}</label>`).join("")
+    + ` from <input type="time" class="s" value="${b.start}"> to <input type="time" class="e" value="${b.end}"> <button type="button" class="ghost">Remove</button>`;
+  div.querySelector("button").addEventListener("click", () => div.remove());
+  $("freeBlocks").appendChild(div);
+}
+$("addBlock").addEventListener("click", () => blockRow());
+
+function renderGoals() {
+  const s = data.settings;
+  ["daily_limit", "app_minutes_limit", "think_first_target"].forEach(k => $(k).value = s[k]);
+  $("digest_time").value = s.digest_time;
+  $("ai_apps").value = s.ai_apps.join(", ");
+  ["notify", "store_text", "track_apps", "import_cli"].forEach(k => $(k).checked = !!s[k]);
+  $("catLimits").innerHTML = CATS.filter(c => c !== "Other").map(c =>
+    `<label class="rowline" style="justify-content:space-between;margin:0;color:var(--ink)">${esc(c)}<input type="number" min="0" data-cat="${esc(c)}" value="${(s.category_limits || {})[c] || 0}" style="width:80px"></label>`).join("");
+  $("freeBlocks").innerHTML = "";
+  (s.ai_free_hours || []).forEach(blockRow);
+}
+
+$("goals").addEventListener("submit", async e => {
+  e.preventDefault();
+  const category_limits = {};
+  document.querySelectorAll("[data-cat]").forEach(i => { if (+i.value > 0) category_limits[i.dataset.cat] = +i.value; });
+  const ai_free_hours = [...$("freeBlocks").children].map(r => ({
+    days: [...r.querySelectorAll("input[type=checkbox]:checked")].map(c => +c.value),
+    start: r.querySelector(".s").value, end: r.querySelector(".e").value
+  })).filter(b => b.days.length && b.start && b.end);
+  await api("/api/settings", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({
+    daily_limit: +$("daily_limit").value || 0, app_minutes_limit: +$("app_minutes_limit").value || 0,
+    think_first_target: +$("think_first_target").value || 0, digest_time: $("digest_time").value || "21:00",
+    ai_apps: $("ai_apps").value.split(",").map(x => x.trim()).filter(Boolean),
+    notify: $("notify").checked, store_text: $("store_text").checked, track_apps: $("track_apps").checked, import_cli: $("import_cli").checked,
+    category_limits, ai_free_hours
+  }) });
+  $("saved").textContent = "Saved";
+  setTimeout(() => $("saved").textContent = "", 2000);
+  load();
+});
+
+$("clearAll").addEventListener("click", async () => {
+  if (!confirm("Delete every recorded prompt, time entry, and alert? Your goals are kept.")) return;
+  await api("/api/clear", { method: "POST" });
+  load();
+});
+
+$("stopApp").addEventListener("click", async () => {
+  if (!confirm("Stop Think First and remove it from login items? Your data stays in ~/.thinkfirst until you delete that folder.")) return;
+  await api("/api/uninstall", { method: "POST" }).catch(() => {});
+  document.querySelector("main").innerHTML = `<div class="hero"><p>Think First has stopped.</p><p class="note" style="font-family:var(--sans);font-size:15px">To remove your data too, delete the .thinkfirst folder in your home folder. To start again, open the Think First app.</p></div>`;
+});
+
+load();
+setInterval(load, 60000);
+let resizeT; addEventListener("resize", () => { clearTimeout(resizeT); resizeT = setTimeout(() => data && renderDaily(), 200); });
+</script>
+</body>
+</html>

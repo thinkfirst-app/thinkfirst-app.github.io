@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy policy: Think First</title><link rel="icon" href="icon.png">
+<style>
+:root{--bg:#fff;--ink:#1F2A37;--muted:#5B6573;--field:#F6F8FA}
+@media (prefers-color-scheme: dark){:root{--bg:#111820;--ink:#E8EDF2;--muted:#9AA6B2;--field:#1B2430}}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:40px 22px 80px}
+h1,h2{font-family:Charter,"Iowan Old Style",Georgia,serif;font-weight:600} h1{font-size:38px} h2{font-size:24px;margin-top:36px}
+code{background:var(--field);padding:1px 5px;border-radius:4px;font-size:15px} a{color:inherit}
+</style></head><body><main><p><a href="index.html">← Think First</a></p>
+<h1>Think First privacy policy</h1>
+<p>Last updated: September 27, 2026</p>
+<p>Think First is a set of tools (a browser extension, a Mac app, and a VS Code extension) that helps you track and reflect on your own AI use. This policy explains what they handle and where it goes.</p>
+<h2>The short version</h2>
+<p>Everything Think First records stays on your computer. There is no Think First server, no account, no analytics, and no advertising. We never sell or share your data, and we couldn&#x27;t if we wanted to, because we never receive it.</p>
+<h2>What Think First records</h2>
+<ul><li><b>Prompts you send on supported AI websites</b>: the text (which you can turn off), the site, the time, and a task category such as &quot;Coding&quot; or &quot;Emails.&quot;</li><li><b>Your guesses</b> and the result of comparing each guess with the AI&#x27;s answer.</li><li><b>Active time</b> on supported AI websites and in AI desktop apps you list, measured only while you&#x27;re actively using them.</li><li><b>Prompts you send to AI command-line tools</b> (Claude Code, Codex CLI, Gemini CLI), read from the history files those tools keep on your computer.</li><li><b>Editing statistics</b> in VS Code: counts of characters typed, pasted, and inserted from AI suggestions, by programming language. The contents of your code are not recorded.</li></ul>
+<h2>Where it is stored</h2>
+<ul><li>Browser extension: in the browser&#x27;s local extension storage on your device.</li><li>Mac app and VS Code extension: in a database file at <code>~/.thinkfirst/data.db</code> on your computer.</li><li>The browser and VS Code extensions send their records to the Mac app over a local connection (127.0.0.1) that never leaves your computer. The Mac app refuses connections from websites.</li></ul>
+<h2>When data leaves your device</h2>
+<p>Only in one case, and only if you choose it: if you add your own Anthropic API key to compare guesses or sort tasks, the question, your guess, and the AI&#x27;s answer are sent to Anthropic&#x27;s API under your account and governed by Anthropic&#x27;s privacy policy. By default, Think First uses the AI model built into Chrome, which runs on your device.</p>
+<h2>Your control</h2>
+<p>You can turn off saving prompt text, turn off any tracker, export your data, or delete all of it from the extension menu or the dashboard. Uninstalling the Mac app from its dashboard stops all tracking; deleting the <code>.thinkfirst</code> folder in your home folder removes the data.</p>
+<h2>Children</h2>
+<p>Think First is not directed at children under 13.</p>
+<h2>Changes and contact</h2>
+<p>If this policy changes, the new version will be posted here with a new date. Questions: MY-EMAIL@example.com</p>
+</main></body></html>
