@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found: Think First</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icon.png">
+<style>
+  :root { --bg:#FFFFFF; --ink:#1F2A37; --muted:#5B6573; --line:#D5DBE1; --mark:#F2C94C;
+    --serif:"Charter","Iowan Old Style","Palatino Linotype",Georgia,serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg:#111820; --ink:#E8EDF2; --muted:#9AA6B2; --line:#34404D; --mark:#E0B83C; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:17px/1.6 var(--sans); min-height:100vh; display:flex; flex-direction:column; }
+  .wrap { max-width:1100px; margin:0 auto; padding:0 22px; width:100%; }
+  nav { display:flex; align-items:center; padding:20px 0; }
+  .logo { display:flex; align-items:center; gap:10px; color:var(--ink); text-decoration:none; font-weight:700; font-size:18px; }
+  .logo img { width:28px; height:28px; border-radius:7px; }
+  main { flex:1; display:flex; align-items:center; }
+  h1 { font-family:var(--serif); font-weight:600; font-size:clamp(36px,6vw,60px); line-height:1.1; margin:0 0 16px; }
+  p { color:var(--muted); font-size:19px; margin:0 0 28px; max-width:520px; }
+  .btn { display:inline-flex; padding:13px 20px; border-radius:11px; font-weight:600; font-size:16px; text-decoration:none; border:2px solid var(--ink); background:var(--ink); color:var(--bg); }
+  .btn:focus-visible { outline:3px solid var(--mark); outline-offset:3px; }
+  footer { padding:28px 0 40px; color:var(--muted); font-size:14px; border-top:1px solid var(--line); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav><a class="logo" href="/"><img src="/icon.png" alt="">Think First</a></nav>
+</div>
+<main><div class="wrap">
+  <h1>That page isn't here.</h1>
+  <p>The address may have changed, or the link had a typo. Everything you need is on the front page.</p>
+  <a class="btn" href="/">Back to Think First</a>
+</div></main>
+<div class="wrap"><footer>Think First is free and open source under the MIT license.</footer></div>
+</body>
+</html>

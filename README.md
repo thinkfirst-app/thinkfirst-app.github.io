@@ -18,7 +18,7 @@ Download the latest version from the [Releases page](../../releases/latest).
 | Mac app | `Think-First-Mac.zip` | Tracks AI desktop apps and AI command-line tools; goals, alerts, and the full dashboard |
 | VS Code extension | `think-first-tracker-1.0.0.vsix` | Estimates how much of your code comes from AI |
 
-Setup steps are on the project website.
+Setup steps are on the project website: [thinkfirst-app.github.io](https://thinkfirst-app.github.io/).
 
 ## Privacy
 
